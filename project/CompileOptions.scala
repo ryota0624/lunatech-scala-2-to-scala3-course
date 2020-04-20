@@ -23,7 +23,9 @@ object CompileOptions {
   val compileOptions = Seq(
     "-unchecked",
     "-deprecation",
-    "-language:_",
+    "-language:Scala2Compat",
+    "-migration",
+    "-rewrite",
     "-encoding", "UTF-8"
   )
 }
