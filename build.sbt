@@ -1,5 +1,5 @@
 
-lazy val `pi_cluster_master` = (project in file("."))
+lazy val `sudoku_solver_master` = (project in file("."))
   .aggregate(
     common,
     `exercise_012_clustered_sudoku_solver`,
