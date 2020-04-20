@@ -7,18 +7,23 @@ import akkapi.cluster.sudoku.SudokuDetailProcessor.UpdateSender
 
 object SudokuDetailProcessor {
 
-  // My protocol
-  sealed trait Command
-  case object ResetSudokuDetailState extends Command
-  final case class Update(cellUpdates: CellUpdates, replyTo: ActorRef[Response]) extends Command
-  final case class GetSudokuDetailState(replyTo: ActorRef[SudokuProgressTracker.Command]) extends Command
+  // Replaced the traditional ADT implemented with case objects/classes
+  // extending a sealed trait with a Dotty enum
+  enum Command {
+    case ResetSudokuDetailState
+    case Update(cellUpdates: CellUpdates, replyTo: ActorRef[Response])
+    case GetSudokuDetailState(replyTo: ActorRef[SudokuProgressTracker.Command])
+  }
+  export Command._
 
-  // My responses
-  sealed trait Response
-  final case class RowUpdate(id: Int, cellUpdates: CellUpdates) extends Response with CborSerializable
-  final case class ColumnUpdate(id: Int, cellUpdates: CellUpdates) extends Response
-  final case class BlockUpdate(id: Int, cellUpdates: CellUpdates) extends Response
-  case object SudokuDetailUnchanged extends Response
+  // Export the generated enum members that are going to be this actor's protocol
+  enum Response {
+    case RowUpdate(id: Int, cellUpdates: CellUpdates)
+    case ColumnUpdate(id: Int, cellUpdates: CellUpdates)
+    case BlockUpdate(id: Int, cellUpdates: CellUpdates)
+    case SudokuDetailUnchanged
+  }
+  export Response._
 
   val InitialDetailState: ReductionSet = cellIndexesVector.map(_ => initialCell)
 

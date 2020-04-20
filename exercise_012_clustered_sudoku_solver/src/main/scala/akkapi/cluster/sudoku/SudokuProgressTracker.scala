@@ -5,12 +5,19 @@ import akka.actor.typed.{ActorRef, Behavior}
 
 object SudokuProgressTracker {
 
-  sealed trait Command
-  final case class NewUpdatesInFlight(count: Int) extends Command
-  final case class SudokuDetailState(index: Int, state: ReductionSet) extends Command
-  // My responses
-  sealed trait Response
-  final case class Result(sudoku: Sudoku) extends Response
+  // Replaced the traditional ADT implemented with case objects/classes
+  // extending a sealed trait with a Dotty enum
+  enum Command {
+    case NewUpdatesInFlight(count: Int)
+    case SudokuDetailState(index: Int, state: ReductionSet)
+  }
+  export Command._
+
+  // Export the generated enum members that are going to be this actor's protocol
+  enum Response {
+    case Result(sudoku: Sudoku)
+  }
+  export Response._
 
   def apply(rowDetailProcessors: Map[Int, ActorRef[SudokuDetailProcessor.Command]],
             sudokuSolver: ActorRef[Response]): Behavior[Command] =

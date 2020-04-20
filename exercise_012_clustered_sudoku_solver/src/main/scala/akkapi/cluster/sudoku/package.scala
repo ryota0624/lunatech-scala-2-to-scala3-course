@@ -19,22 +19,6 @@ package object sudoku {
 
   import SudokuDetailProcessor.RowUpdate
 
-  implicit class RowUpdatesToSudokuField(val update: Vector[SudokuDetailProcessor.RowUpdate]) extends AnyVal {
-    import scala.language.implicitConversions
-    def toSudokuField: SudokuField = {
-      val rows =
-        update
-          .map { case SudokuDetailProcessor.RowUpdate(id, cellUpdates) => (id, cellUpdates)}
-        .to(Map).withDefaultValue(cellUpdatesEmpty)
-      val sudoku = for {
-        (row, cellUpdates) <- Vector.range(0, 9).map(row => (row, rows(row)))
-        x = cellUpdates.to(Map).withDefaultValue(Set(0))
-        y = Vector.range(0, 9).map(n => x(n))
-        } yield y
-      SudokuField(sudoku)
-    }
-  }
-
   implicit class SudokuFieldOps(val sudokuField: SudokuField) extends AnyVal {
     def transpose: SudokuField = SudokuField(sudokuField.sudoku.transpose)
 
