@@ -1,5 +1,7 @@
 package akkapi.cluster
 
+import scala.language.implicitConversions
+
 package object sudoku {
 
   type Seq[+A] = scala.collection.immutable.Seq[A]
@@ -14,13 +16,36 @@ package object sudoku {
   type ReductionSet = Vector[CellContent]
   type Sudoku = Vector[ReductionSet]
 
-  type CellUpdates = Vector[(Int, Set[Int])]
+  opaque type CellUpdates = Vector[(Int, Set[Int])]
+  object CellUpdates {
+    def single(update: (Int, Set[Int])): CellUpdates = update +: empty
+    val empty: CellUpdates = Vector.empty[(Int, Set[Int])]
+  }
+  extension on (updates: CellUpdates) {
+    def size: Int = updates.size
+    def toMap: Map[Int, Set[Int]] = updates.to(Map).withDefaultValue(Set(0))
+
+    // Using 'Any' because cannot have type parameter on extension method
+    def foreach(fn: (Int, Set[Int]) => Any): Unit = updates.foreach(fn.tupled)
+
+    // Because we cannot have type parameters on extension methods, we cannot define a generic 'foldLeft' primitive
+    // So we implement a specialised method for applying a set of updates to a ReductionSet
+    def applyTo(reductionSet: ReductionSet): ReductionSet = (updates foldLeft reductionSet) {
+      case (stateTally, (index, updatedCellContent)) =>
+        stateTally.updated(index, stateTally(index) & updatedCellContent)
+    }
+
+  }
+
+  extension {
+    def (update: (Int, Set[Int])) +: (updates: CellUpdates): CellUpdates = update +: updates
+  }
+
   val cellUpdatesEmpty = Vector.empty[(Int, Set[Int])]
 
   import SudokuDetailProcessor.RowUpdate
 
   implicit class RowUpdatesToSudokuField(val update: Vector[SudokuDetailProcessor.RowUpdate]) extends AnyVal {
-    import scala.language.implicitConversions
     def toSudokuField: SudokuField = {
       val rows =
         update
@@ -28,7 +53,11 @@ package object sudoku {
         .to(Map).withDefaultValue(cellUpdatesEmpty)
       val sudoku = for {
         (row, cellUpdates) <- Vector.range(0, 9).map(row => (row, rows(row)))
-        x = cellUpdates.to(Map).withDefaultValue(Set(0))
+
+        // We shouldn't need to use the 'toMap' extension method here because CellUpdates is not opaque in this file
+        // But for some reason the 'to(Map)' construct doesn't work. It might be a problem of the combination of
+        // an implicit conversion and the opaque type
+        x = cellUpdates.toMap
         y = Vector.range(0, 9).map(n => x(n))
         } yield y
       SudokuField(sudoku)

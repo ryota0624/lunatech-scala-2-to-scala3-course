@@ -97,14 +97,11 @@ class SudokuDetailProcessor[DetailType <: SudokoDetailType : UpdateSender] priva
   }
 
   private def mergeState(state: ReductionSet, cellUpdates: CellUpdates): ReductionSet = {
-      (cellUpdates foldLeft state) {
-      case (stateTally, (index, updatedCellContent)) =>
-        stateTally.updated(index, stateTally(index) & updatedCellContent)
-    }
+    cellUpdates.applyTo(state)
   }
 
   private def stateChanges(state: ReductionSet, updatedState: ReductionSet): CellUpdates = {
-    ((state zip updatedState).zipWithIndex foldRight cellUpdatesEmpty) {
+    ((state zip updatedState).zipWithIndex foldRight CellUpdates.empty) {
       case (((previousCellContent, updatedCellContent), index), cellUpdates)
         if updatedCellContent != previousCellContent =>
         (index, updatedCellContent) +: cellUpdates
