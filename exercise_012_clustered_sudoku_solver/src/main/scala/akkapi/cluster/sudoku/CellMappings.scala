@@ -3,7 +3,7 @@ package akkapi.cluster.sudoku
 object CellMappings {
 
   def rowToColumnCoordinates(rowNr: Int, cellNr: Int): (Int, Int) =
-    (cellNr, rowNr)
+      (cellNr, rowNr)
 
   def rowToBlockCoordinates(rowNr: Int, cellNr: Int): (Int, Int) = {
     ((rowNr / 3) * 3 + cellNr / 3, (rowNr % 3) * 3 + cellNr % 3)
@@ -21,5 +21,4 @@ object CellMappings {
 
   def blockToColumnCoordinates(blockNr: Int, cellNr: Int): (Int, Int) =
     ((blockNr % 3) * 3 + cellNr % 3 , (blockNr / 3) * 3 + cellNr / 3)
-
 }

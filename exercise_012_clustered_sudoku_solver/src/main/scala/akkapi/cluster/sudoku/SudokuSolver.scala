@@ -55,7 +55,7 @@ object SudokuSolver {
 
 class SudokuSolver private (context: ActorContext[SudokuSolver.CommandAndResponses],
                             buffer: StashBuffer[SudokuSolver.CommandAndResponses]) {
-  import CellMappings._
+  import CellMappings._                            
   import SudokuSolver._
 
   context.system.receptionist ! Receptionist.Register(Key, context.self)
