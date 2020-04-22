@@ -67,7 +67,7 @@ class SudokuDetailProcessor[DetailType <: SudokoDetailType : UpdateSender] priva
       val previousState = state
 //      context.log.info(s"~~> state = $state / cellUpdates = $cellUpdates")
       val updatedState = mergeState(state, cellUpdates)
-      if (updatedState == previousState && cellUpdates != cellUpdatesEmpty) {
+      if (updatedState == previousState && cellUpdates != CellUpdates.empty) {
         replyTo ! SudokuDetailUnchanged
         Behaviors.same
       } else {

@@ -34,12 +34,13 @@ package object sudoku {
       case (stateTally, (index, updatedCellContent)) =>
         stateTally.updated(index, stateTally(index) & updatedCellContent)
     }
-
   }
 
   extension {
     def (update: (Int, Set[Int])) +: (updates: CellUpdates): CellUpdates = update +: updates
   }
+
+  given Eql[CellUpdates, CellUpdates] = Eql.derived
 
   val cellUpdatesEmpty = Vector.empty[(Int, Set[Int])]
 
