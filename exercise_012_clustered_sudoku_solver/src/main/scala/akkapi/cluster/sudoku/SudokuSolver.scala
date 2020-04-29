@@ -13,9 +13,12 @@ object SudokuSolver {
 
   val Key: ServiceKey[Command] = ServiceKey("sudoku-processor")
 
+  final case class RowCellUpdate(index: Int, rowCellUpdate: CellContent) extends CborSerializable
+  type RowCellUpdates = Vector[RowCellUpdate]
+  final case class InitialRowUpdate(id: Int, rowCellUpdates: RowCellUpdates) extends CborSerializable
   // SudokuSolver Protocol
   sealed trait Command
-  final case class InitialRowUpdates(rowUpdates: Vector[SudokuDetailProcessor.RowUpdate],
+  final case class InitialRowUpdates(rowUpdates: Vector[InitialRowUpdate],
                                      replyTo: ActorRef[SudokuSolver.Response]) extends Command with CborSerializable
   // Wrapped responses
   private final case class SudokuDetailProcessorResponseWrapped(response: SudokuDetailProcessor.Response) extends Command
@@ -73,8 +76,9 @@ class SudokuSolver private (context: ActorContext[SudokuSolver.Command],
     case InitialRowUpdates(rowUpdates, sender) =>
       context.log.info(s"~~> SudokuSolver receiving initial row updates: $rowUpdates")
       rowUpdates.foreach {
-        case SudokuDetailProcessor.RowUpdate(row, cellUpdates) =>
-          rowDetailProcessors(row) ! SudokuDetailProcessor.Update(cellUpdates, detailProcessorResponseMapper)
+        case InitialRowUpdate(row, cellUpdates) =>
+          val update = CellUpdates(cellUpdates.map{case RowCellUpdate(index, update) => ((index, update)) })
+          rowDetailProcessors(row) ! SudokuDetailProcessor.Update(update, detailProcessorResponseMapper)
       }
       progressTracker ! SudokuProgressTracker.NewUpdatesInFlight(rowUpdates.size)
       processRequest(Some(sender), System.currentTimeMillis())

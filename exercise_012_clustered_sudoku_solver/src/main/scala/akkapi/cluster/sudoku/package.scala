@@ -20,6 +20,7 @@ package object sudoku {
   object CellUpdates {
     def single(update: (Int, Set[Int])): CellUpdates = update +: empty
     val empty: CellUpdates = Vector.empty[(Int, Set[Int])]
+    def apply(initial: Vector[(Int, Set[Int])]): CellUpdates = empty ++ initial
   }
   extension on (updates: CellUpdates) {
     def size: Int = updates.size
@@ -33,6 +34,10 @@ package object sudoku {
     def applyTo(reductionSet: ReductionSet): ReductionSet = (updates foldLeft reductionSet) {
       case (stateTally, (index, updatedCellContent)) =>
         stateTally.updated(index, stateTally(index) & updatedCellContent)
+    }
+    
+    def toInitialCellUpdates: SudokuSolver.RowCellUpdates = {
+      updates.map((index, cellUpdate) => SudokuSolver.RowCellUpdate(index, cellUpdate))
     }
   }
 

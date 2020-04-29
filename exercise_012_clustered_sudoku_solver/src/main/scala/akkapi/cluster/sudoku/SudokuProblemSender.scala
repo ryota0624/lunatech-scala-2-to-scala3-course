@@ -65,13 +65,19 @@ class SudokuProblemSender private (sudokuSolver: ActorRef[SudokuSolver.Command],
 
   private val problemSendInterval = sudokuSolverSettings.ProblemSender.SendInterval
   timers.startTimerAtFixedRate(SendNewSudoku, problemSendInterval) // on a 5 node RPi 4 based cluster in steady state, this can be lowered to about 6ms
-
+  
   def sending(): Behavior[Command] = Behaviors.receiveMessagePartial {
     case SendNewSudoku =>
       context.log.debug("sending new sudoku problem")
       val nextRowUpdates = rowUpdatesSeq.next
-      context.log.info(s"==> ProblemSender sending $nextRowUpdates")
-      sudokuSolver ! SudokuSolver.InitialRowUpdates(nextRowUpdates, solutionWrapper)
+      val nextInitialRowUpdates = 
+        nextRowUpdates.map {
+          case SudokuDetailProcessor.RowUpdate(id, cellUpdates) =>
+            val initialCellUpdates = cellUpdates.toInitialCellUpdates
+            context.log.info(s"==> ProblemSender sending to DetailProcessor(Row($id)): $nextRowUpdates ")
+            SudokuSolver.InitialRowUpdate(id, initialCellUpdates)
+        }
+      sudokuSolver ! SudokuSolver.InitialRowUpdates(nextInitialRowUpdates, solutionWrapper)
       Behaviors.same
     case SolutionWrapper(solution: SudokuSolver.SudokuSolution) =>
       context.log.info(s"${SudokuIO.sudokuPrinter(solution)}")
