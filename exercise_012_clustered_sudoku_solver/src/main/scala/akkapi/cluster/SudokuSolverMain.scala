@@ -54,8 +54,8 @@ object SudokuSolverMain {
     args.view.collect { case Opt(key, value) => key -> value }.toMap
 
   def applySystemProperties(options: Map[String, String]): Unit =
-    for ((key, value) <- options if key startsWith "-D")
-      System.setProperty(key substring 2, value)
+    for ((key, value) <- options if key `startsWith` "-D")
+      System.setProperty(key `substring` 2, value)
 
   def main(args: Array[String]): Unit = {
 

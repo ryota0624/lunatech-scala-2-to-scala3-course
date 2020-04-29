@@ -32,6 +32,7 @@ object CompileOptions {
     "-strict",
     "-language:Scala2Compat",
     "-migration",
+    "-rewrite",
     "-encoding", "UTF-8"
   )
 }
