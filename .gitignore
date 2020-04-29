@@ -11,6 +11,9 @@ collectedLogs.zip
 .swp
 project/metals.sbt
 
+# VCS specific
+*.code-workspace
+
 # sbt specific
 .cache/
 .history/
