@@ -27,7 +27,7 @@ class SudokuProgressTracker private (rowDetailProcessors: Map[Int, ActorRef[Sudo
 
   def trackProgress(updatesInFlight: Int): Behavior[Command] = Behaviors.receiveMessagePartial {
     case NewUpdatesInFlight(updateCount) if updatesInFlight - 1 == 0 =>
-      rowDetailProcessors.foreach { case (_, processor) => processor ! SudokuDetailProcessor.GetSudokuDetailState(context.self) }
+      rowDetailProcessors.foreach { (_, processor) => processor ! SudokuDetailProcessor.GetSudokuDetailState(context.self) }
       collectEndState()
     case NewUpdatesInFlight(updateCount) =>
       trackProgress(updatesInFlight + updateCount)
@@ -42,4 +42,3 @@ class SudokuProgressTracker private (rowDetailProcessors: Map[Int, ActorRef[Sudo
         collectEndState(remainingRows = remainingRows - 1, detail +: endState)
     }
 }
-

@@ -77,7 +77,7 @@ package object sudoku {
         .map(_.zipWithIndex)
         .map(row => row.filterNot(_._1 == Set(0)))
         .zipWithIndex.filter(_._1.nonEmpty)
-        .map { case (c, i) =>
+        .map { (c, i) =>
           RowUpdate(i, c.map(_.swap))
         }
     }

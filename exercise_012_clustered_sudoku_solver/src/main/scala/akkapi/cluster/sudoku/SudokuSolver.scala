@@ -85,7 +85,7 @@ class SudokuSolver private (context: ActorContext[SudokuSolver.Command],
     case SudokuDetailProcessorResponseWrapped(response) => response match {
       case SudokuDetailProcessor.RowUpdate(rowNr, updates) =>
         updates.foreach {
-          case (rowCellNr, newCellContent) =>
+          (rowCellNr, newCellContent) =>
 
             val (columnNr, columnCellNr) = rowToColumnCoordinates(rowNr, rowCellNr)
             val columnUpdate = Vector(columnCellNr -> newCellContent)
@@ -99,7 +99,7 @@ class SudokuSolver private (context: ActorContext[SudokuSolver.Command],
         Behaviors.same
       case SudokuDetailProcessor.ColumnUpdate(columnNr, updates) =>
         updates.foreach {
-          case (colCellNr, newCellContent) =>
+          (colCellNr, newCellContent) =>
 
             val (rowNr, rowCellNr) = columnToRowCoordinates(columnNr, colCellNr)
             val rowUpdate = Vector(rowCellNr -> newCellContent)
@@ -113,7 +113,7 @@ class SudokuSolver private (context: ActorContext[SudokuSolver.Command],
         Behaviors.same
       case SudokuDetailProcessor.BlockUpdate(blockNr, updates) =>
         updates.foreach {
-          case (blockCellNr, newCellContent) =>
+          (blockCellNr, newCellContent) =>
 
             val (rowNr, rowCellNr) = blockToRowCoordinates(blockNr, blockCellNr)
             val rowUpdate = Vector(rowCellNr -> newCellContent)
