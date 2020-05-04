@@ -7,7 +7,7 @@ object SudokuIO {
   def printRow( row: ReductionSet): String = {
     def printSubRow( subRowNo: Int): String = {
       val printItems = List(1,2,3) map( x => x + subRowNo * 3)
-      (for  (elem <- row) 
+      (for  (elem <- row)
         yield {
           (printItems map (item => if ((elem & printItems.toSet).contains(item)) item.toString else " ")).mkString("")
         }).mkString("| ", " | ", " |")
@@ -56,8 +56,8 @@ object SudokuIO {
   import java.io.{BufferedReader, File, FileReader}
 
   class FileLineTraversable(file: File) extends Iterable[String] {
-    val fr = new FileReader(file)
-    val input = new BufferedReader(fr)
+    val fr = FileReader(file)
+    val input = BufferedReader(fr)
     var cachedLine: Option[String] = None
     var finished: Boolean = false
 
@@ -82,13 +82,13 @@ object SudokuIO {
             }
           } catch {
             case e: java.io.IOError =>
-              throw new IllegalStateException(e.toString)
+              throw IllegalStateException(e.toString)
           }
       }
 
       override def next(): String = {
         if (! hasNext) {
-          throw new NoSuchElementException("No more lines in file")
+          throw NoSuchElementException("No more lines in file")
         }
         val currentLine = cachedLine.get
         cachedLine = None
@@ -112,7 +112,7 @@ object SudokuIO {
 
 
   def readSudokuFromFile(sudokuInputFile: java.io.File): Vector[(Int, CellUpdates)] = {
-    val dataLines = new FileLineTraversable(sudokuInputFile).toVector
+    val dataLines = FileLineTraversable(sudokuInputFile).toVector
     val cellsIn =
       dataLines
         .map { inputLine => """\|""".r replaceAllIn(inputLine, "")}     // Remove 3x3 separator character
