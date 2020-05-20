@@ -4,51 +4,6 @@ import java.util.NoSuchElementException
 
 object SudokuIO {
 
-  def printRow( row: ReductionSet): String = {
-    def printSubRow( subRowNo: Int): String = {
-      val printItems = List(1,2,3) map( x => x + subRowNo * 3)
-      (for  (elem <- row) 
-        yield {
-          (printItems map (item => if ((elem & printItems.toSet).contains(item)) item.toString else " ")).mkString("")
-        }).mkString("| ", " | ", " |")
-    }
-    (for  (subRow <- 0 until 3)  yield printSubRow(subRow)).mkString("\n")
-  }
-
-  def printRowShort( row: ReductionSet): String = {
-    (for
-      (elem <- row)
-    yield {
-      if (elem.size == 1) elem.head.toString else " "
-    }).mkString("|","|","|")
-
-  }
-
-  private def sudokuCellRepresentation(content: CellContent): String = {
-    content.toList match {
-      case Nil => "x"
-      case singleValue +: Nil => singleValue.toString
-      case _ => " "
-    }
-  }
-
-  private def sudokuRowPrinter(threeRows: Vector[ReductionSet]): String = {
-    val rowSubBlocks = for {
-      row <- threeRows
-      rowSubBlock <- row.map(el => sudokuCellRepresentation(el)).sliding(3,3)
-      rPres = rowSubBlock.mkString
-
-    } yield rPres
-    rowSubBlocks.sliding(3,3).map(_.mkString("", "|", "")).mkString("|", "|\n|", "|\n")
-  }
-
-  def sudokuPrinter(result: SudokuSolver.SudokuSolution): String = {
-    result.sudoku
-      .sliding(3,3)
-      .map(sudokuRowPrinter)
-      .mkString("\n+---+---+---+\n", "+---+---+---+\n", "+---+---+---+")
-  }
-
   /*
    * FileLineTraversable code taken from "Scala in Depth" by Joshua Suereth
    */

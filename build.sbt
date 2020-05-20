@@ -16,7 +16,7 @@ lazy val `scala-2-to-scala-3-master` = (project in file("."))
     `exercise_008_enum_and_export`,
     `exercise_009_union_types`,
     `exercise_010_opaque_type_aliases`,
-    `exercise_011_multiversal_equality`
+    `exercise_020_opaque_experiment`
   )
   .settings(ThisBuild / scalaVersion := Version.scalaVersion)
   .settings(CommonSettings.commonSettings: _*)
@@ -68,7 +68,7 @@ lazy val `exercise_010_opaque_type_aliases` = project
   .configure(CommonSettings.configure)
   .dependsOn(common % "test->test;compile->compile")
 
-lazy val `exercise_011_multiversal_equality` = project
+lazy val `exercise_020_opaque_experiment` = project
   .configure(CommonSettings.configure)
   .dependsOn(common % "test->test;compile->compile")
        

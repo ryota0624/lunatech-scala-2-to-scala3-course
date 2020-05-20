@@ -2,6 +2,7 @@ package org.lunatechlabs.dotty.sudoku
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
+import ReductionSets.{ReductionSet, Sudoku}
 
 object SudokuProgressTracker {
 
@@ -40,10 +41,12 @@ class SudokuProgressTracker private (rowDetailProcessors: Map[Int, ActorRef[Sudo
 
   def collectEndState(remainingRows: Int = 9, endState: Vector[SudokuDetailState] = Vector.empty[SudokuDetailState]): Behavior[Command] =
     Behaviors.receiveMessagePartial {
-      case detail @ SudokuDetailState(index, state) if remainingRows == 1 =>
-        sudokuSolver ! Result((detail +: endState).sortBy { case SudokuDetailState(idx, _) => idx }.map { case SudokuDetailState(_, state) => state})
+      case detail: SudokuDetailState if remainingRows == 1 =>
+        val s1: Vector[ReductionSet] = ((detail +: endState).sortBy { case SudokuDetailState(idx, _) => idx }).map {x => x.state}
+        val sudoku = Sudoku.toSudoku((detail +: endState))
+        sudokuSolver ! Result(sudoku)
         trackProgress(updatesInFlight = 0)
-      case detail @ SudokuDetailState(index, state) =>
+      case detail: SudokuDetailState =>
         collectEndState(remainingRows = remainingRows - 1, detail +: endState)
     }
 }

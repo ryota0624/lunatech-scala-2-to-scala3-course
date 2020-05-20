@@ -4,6 +4,7 @@ import java.io.File
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors, TimerScheduler}
 import akka.actor.typed.{ActorRef, Behavior}
+import ReductionSets.ReductionSet
 
 object SudokuProblemSender {
 
@@ -72,7 +73,7 @@ class SudokuProblemSender private (sudokuSolver: ActorRef[SudokuSolver.Command],
       sudokuSolver ! SudokuSolver.InitialRowUpdates(nextRowUpdates, context.self)
       Behaviors.same
     case solution: SudokuSolver.SudokuSolution =>
-      context.log.info(s"${SudokuIO.sudokuPrinter(solution)}")
+      context.log.info(s"${ReductionSet.sudokuPrinter(solution)}")
       Behaviors.same
   }
 }

@@ -3,6 +3,7 @@ package org.lunatechlabs.dotty.sudoku
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import org.lunatechlabs.dotty.sudoku.SudokuDetailProcessor.UpdateSender
+import ReductionSets.ReductionSet
 
 object SudokuDetailProcessor {
 
@@ -23,7 +24,7 @@ object SudokuDetailProcessor {
   }
   export Response._
 
-  val InitialDetailState: ReductionSet = cellIndexesVector.map(_ => initialCell)
+  val InitialDetailState: ReductionSet = ReductionSet.initial
 
   def apply[DetailType <: SudokoDetailType](id: Int,
                                             state: ReductionSet = InitialDetailState)
@@ -67,7 +68,7 @@ class SudokuDetailProcessor[DetailType <: SudokoDetailType : UpdateSender] priva
     Behaviors.receiveMessagePartial {
     case Update(cellUpdates, replyTo) if ! fullyReduced =>
       val previousState = state
-      val updatedState = mergeState(state, cellUpdates)
+      val updatedState = ReductionSet.mergeState(state, cellUpdates)
       if (updatedState == previousState && cellUpdates != cellUpdatesEmpty) {
         replyTo ! SudokuDetailUnchanged
         Behaviors.same
@@ -81,8 +82,8 @@ class SudokuDetailProcessor[DetailType <: SudokoDetailType : UpdateSender] priva
           // The following can also be written as:
           // given ActorRef[Response] = replyTo
           // updateSender.sendUpdate(id, stateChanges(state, transformedUpdatedState))         
-          updateSender.sendUpdate(id, stateChanges(state, transformedUpdatedState))(using replyTo)
-          operational(id, transformedUpdatedState, isFullyReduced(transformedUpdatedState))
+          updateSender.sendUpdate(id, ReductionSet.stateChanges(state, transformedUpdatedState))(using replyTo)
+          operational(id, transformedUpdatedState, transformedUpdatedState.isFullyReduced)
         }
       }
 
@@ -97,28 +98,6 @@ class SudokuDetailProcessor[DetailType <: SudokoDetailType : UpdateSender] priva
     case ResetSudokuDetailState =>
       operational(id, InitialDetailState, fullyReduced = false)
 
-  }
-
-  private def mergeState(state: ReductionSet, cellUpdates: CellUpdates): ReductionSet = {
-      (cellUpdates foldLeft state) {
-      case (stateTally, (index, updatedCellContent)) =>
-        stateTally.updated(index, stateTally(index) & updatedCellContent)
-    }
-  }
-
-  private def stateChanges(state: ReductionSet, updatedState: ReductionSet): CellUpdates = {
-    ((state zip updatedState).zipWithIndex foldRight cellUpdatesEmpty) {
-      case (((previousCellContent, updatedCellContent), index), cellUpdates)
-        if updatedCellContent != previousCellContent =>
-        (index, updatedCellContent) +: cellUpdates
-
-      case (_, cellUpdates) => cellUpdates
-    }
-  }
-
-  private def isFullyReduced(state: ReductionSet): Boolean = {
-    val allValuesInState = state.flatten
-    allValuesInState == allValuesInState.distinct
   }
 
 }
