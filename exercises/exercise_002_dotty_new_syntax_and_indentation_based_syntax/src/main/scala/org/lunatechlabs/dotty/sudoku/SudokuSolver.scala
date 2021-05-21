@@ -164,5 +164,6 @@ class SudokuSolver private (context: ActorContext[SudokuSolver.Command],
     for {
       processors <- allDetailProcessors
       (_, processor) <- processors
-    } processor ! SudokuDetailProcessor.ResetSudokuDetailState
+    }
+    do processor ! SudokuDetailProcessor.ResetSudokuDetailState
 }
