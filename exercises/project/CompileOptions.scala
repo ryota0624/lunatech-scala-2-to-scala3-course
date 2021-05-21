@@ -30,6 +30,8 @@ object CompileOptions {
     "-unchecked",
     "-deprecation",
     "-encoding", "UTF-8",
+    "-source:3.0-migration",
+    "-rewrite"
     //"-source:future-migration",
   )
 }
