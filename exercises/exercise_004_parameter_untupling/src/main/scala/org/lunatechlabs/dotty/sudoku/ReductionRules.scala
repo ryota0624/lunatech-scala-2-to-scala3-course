@@ -4,7 +4,7 @@ object ReductionRules:
 
   def reductionRuleOne(reductionSet: ReductionSet): ReductionSet =
     val inputCellsGrouped = reductionSet.filter(_.size <= 7).groupBy(identity)
-    val completeInputCellGroups = inputCellsGrouped.filter { (set, setOccurrences) => 
+    val completeInputCellGroups = inputCellsGrouped.filter { (set, setOccurrences) =>
       set.size == setOccurrences.length
     }
     val completeAndIsolatedValueSets = completeInputCellGroups.keys.toList
@@ -26,7 +26,7 @@ object ReductionRules:
       CELLPossibleValues
         .zip(valueOccurrences)
         .groupBy ((value, occurrence) => occurrence )
-        .filter { case (loc, occ) => loc.length == occ.length && loc.length <= 6 }
+        .filter { (loc, occ) => loc.length == occ.length && loc.length <= 6 }
 
     val cellIndexListToReducedValue = cellIndexesToValues.map { (index, seq) =>
       (index, (seq.map ((value, _) => value )).toSet)

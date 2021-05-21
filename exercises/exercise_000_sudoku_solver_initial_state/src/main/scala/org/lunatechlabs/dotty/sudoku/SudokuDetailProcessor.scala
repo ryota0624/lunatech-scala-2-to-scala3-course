@@ -58,20 +58,20 @@ class SudokuDetailProcessor[DetailType <: SudokoDetailType: UpdateSender] privat
 ) {
 
   import ReductionRules.{ reductionRuleOne, reductionRuleTwo }
-  import SudokuDetailProcessor._
+  import SudokuDetailProcessor.*
 
   def operational(id: Int, state: ReductionSet, fullyReduced: Boolean): Behavior[Command] =
     Behaviors.receiveMessage {
       case Update(cellUpdates, replyTo) if !fullyReduced =>
         val previousState = state
         val updatedState = mergeState(state, cellUpdates)
-        if (updatedState == previousState && cellUpdates != cellUpdatesEmpty) {
+        if updatedState == previousState && cellUpdates != cellUpdatesEmpty then {
           replyTo ! SudokuDetailUnchanged
           Behaviors.same
         }
         else {
           val transformedUpdatedState = reductionRuleTwo(reductionRuleOne(updatedState))
-          if (transformedUpdatedState == state) {
+          if transformedUpdatedState == state then {
             replyTo ! SudokuDetailUnchanged
             Behaviors.same
           }

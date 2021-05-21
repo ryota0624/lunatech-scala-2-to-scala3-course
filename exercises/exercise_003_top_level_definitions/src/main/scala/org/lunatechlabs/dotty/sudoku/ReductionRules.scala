@@ -9,7 +9,7 @@ object ReductionRules:
     }
     val completeAndIsolatedValueSets = completeInputCellGroups.keys.toList
     completeAndIsolatedValueSets.foldLeft(reductionSet) {
-      case (cells, caivSet) =>
+      (cells, caivSet) =>
         cells.map { cell =>
           if cell != caivSet then cell &~ caivSet else cell
         }
@@ -26,15 +26,15 @@ object ReductionRules:
     val cellIndexesToValues =
       CELLPossibleValues
         .zip(valueOccurrences)
-        .groupBy { case (value, occurrence) => occurrence }
-        .filter { case (loc, occ) => loc.length == occ.length && loc.length <= 6 }
+        .groupBy { (value, occurrence) => occurrence }
+        .filter { (loc, occ) => loc.length == occ.length && loc.length <= 6 }
 
     val cellIndexListToReducedValue = cellIndexesToValues.map {
-      case (index, seq) => (index, (seq.map { case (value, _) => value }).toSet)
+      (index, seq) => (index, (seq.map { case (value, _) => value }).toSet)
     }
 
     val cellIndexToReducedValue = cellIndexListToReducedValue.flatMap {
-      case (cellIndexList, reducedValue) =>
+      (cellIndexList, reducedValue) =>
         cellIndexList.map(cellIndex => cellIndex -> reducedValue)
     }
 
