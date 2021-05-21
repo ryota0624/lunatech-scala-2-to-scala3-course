@@ -32,11 +32,10 @@ object SudokuIO {
   }
 
   private def sudokuRowPrinter(threeRows: Vector[ReductionSet]): String = {
-    val rowSubBlocks = for {
+    val rowSubBlocks = for
       row <- threeRows
       rowSubBlock <- row.map(el => sudokuCellRepresentation(el)).sliding(3,3)
       rPres = rowSubBlock.mkString
-    }
 
     yield rPres
     rowSubBlocks.sliding(3,3).map(_.mkString("", "|", "")).mkString("|", "|\n|", "|\n")
@@ -100,14 +99,13 @@ object SudokuIO {
   }
 
   def convertFromCellsToComplete(cellsIn: Vector[(String, Int)]): Vector[(Int, CellUpdates)] =
-    for {
+    for
       (rowCells, row) <- cellsIn
       updates = rowCells.zipWithIndex.foldLeft(cellUpdatesEmpty) {
         case (cellUpdates, (c, index)) if c != ' ' =>
           (index, Set(c.toString.toInt)) +: cellUpdates
         case (cellUpdates, _) => cellUpdates
       }
-    }
 
     yield (row, updates)
 

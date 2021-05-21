@@ -161,9 +161,8 @@ class SudokuSolver private (context: ActorContext[SudokuSolver.Command],
     }
 
   private def resetAllDetailProcessors(): Unit =
-    for {
+    for
       processors <- allDetailProcessors
       (_, processor) <- processors
-    }
     do processor ! SudokuDetailProcessor.ResetSudokuDetailState
 }
